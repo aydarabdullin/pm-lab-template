@@ -1,0 +1,17 @@
+name: "Bootstrap: метки, этап и стартовые задачи"
+# Запускается вручную один раз после создания репозитория из шаблона:
+# Actions → этот workflow → Run workflow.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Создать метки, этап и задачи
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/bootstrap.sh

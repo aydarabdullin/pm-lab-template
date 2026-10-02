@@ -1,0 +1,31 @@
+name: lab1-check
+# Информационная проверка: показывает предупреждения, но не блокирует работу.
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Обязательные документы ЛР 1
+        run: |
+          for f in README.md docs/team-agreement.md docs/business-case.md \
+                   docs/charter.md docs/stakeholders.md \
+                   docs/adr/ADR-001-lifecycle.md docs/ai-usage.md; do
+            [ -f "$f" ] || echo "::warning::Нет файла $f"
+          done
+      - name: Незаполненные места
+        run: |
+          for f in docs/team-agreement.md docs/business-case.md docs/charter.md \
+                   docs/stakeholders.md docs/adr/ADR-001-lifecycle.md; do
+            if [ -f "$f" ] && grep -q "TODO" "$f"; then
+              echo "::notice::В $f остались пометки TODO"
+            fi
+            if [ -f "$f" ] && grep -qE "<(\.\.\.|[А-Яа-яЁё][^>]*)>" "$f"; then
+              echo "::notice::В $f остались шаблонные поля вида <...>"
+            fi
+          done
+      - name: README заполнен
+        run: |
+          if grep -q "<Название проекта>" README.md; then
+            echo "::notice::В README не заменено название проекта"
+          fi

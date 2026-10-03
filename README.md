@@ -18,6 +18,7 @@
 - Доска проекта: <ссылка на GitHub Project>
 - Устав проекта: [docs/charter.md](docs/charter.md)
 - Задание ЛР 1: [docs/tasks/lab-1-assignment.md](docs/tasks/lab-1-assignment.md)
+- Как сделать Pull Request в браузере: [docs/guides/pr-web-ui.md](docs/guides/pr-web-ui.md)
 
 ## Статус
 

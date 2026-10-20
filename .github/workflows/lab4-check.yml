@@ -1,0 +1,38 @@
+name: lab4-check
+# Информационная проверка ЛР 4: показывает предупреждения, но не блокирует работу.
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Обязательные файлы ЛР 4
+        run: |
+          for f in docs/risk-register.md docs/quality-plan.md CONTRIBUTING.md \
+                   .github/workflows/ci.yml .github/release.yml data/validation.json \
+                   notebooks/05_risk_monte_carlo.ipynb; do
+            [ -f "$f" ] || echo "::warning::Нет файла $f"
+          done
+      - name: Незаполненные места
+        run: |
+          for f in docs/risk-register.md docs/quality-plan.md CONTRIBUTING.md; do
+            [ -f "$f" ] || continue
+            grep -q "TODO" "$f" && echo "::notice::В $f остались пометки TODO" || true
+            grep -q "<\.\.\.>" "$f" && echo "::notice::В $f остались незаполненные поля <...>" || true
+          done
+      - name: Реестр рисков
+        run: |
+          f=docs/risk-register.md
+          [ -f "$f" ] || exit 0
+          n=$(grep -cE "^\| R[0-9]+ \|" "$f" || true)
+          [ "$n" -ge 8 ] || echo "::warning::В реестре $n рисков, нужно не меньше 8"
+          grep -qE "^\| O[0-9]+ \|" "$f" || echo "::notice::В реестре нет возможностей (O1, O2...)"
+          grep -q "P85" "$f" || echo "::notice::В $f нет результатов Монте-Карло (P85)"
+          grep -q "EMV" "$f" || echo "::notice::В $f нет дерева решений (EMV)"
+      - name: Свои тесты
+        run: |
+          n=$(grep -rhE "^def test_" tests 2>/dev/null | wc -l)
+          [ "${n:-0}" -ge 9 ] || echo "::notice::Тестов $n. В шаблоне 6, добавьте не меньше 3 своих"
+      - name: Источники данных и атрибуция в README
+        run: |
+          grep -qE "^## Источники данных" README.md || echo "::notice::В README нет раздела «## Источники данных» с атрибуцией (шаг 3)"

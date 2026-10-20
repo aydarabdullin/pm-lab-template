@@ -1,0 +1,13 @@
+{
+  "_comment": "Правила проверки слоёв в data/processed для scripts/validate_data.py. Замените значения под свой проект.",
+  "crs": "EPSG:4326",
+  "bbox": [60.0, 56.5, 61.0, 57.1],
+  "max_file_mb": 10,
+  "layers": {
+    "boundary":     {"geometry": ["Polygon", "MultiPolygon"], "min_count": 1},
+    "districts":    {"geometry": ["Polygon", "MultiPolygon"], "min_count": 5,   "id": ["osm_type", "osm_id"], "required": ["name"]},
+    "water_points": {"geometry": ["Point"],                   "min_count": 50,  "id": ["osm_type", "osm_id"], "required": ["amenity"]},
+    "parks":        {"geometry": ["Polygon", "MultiPolygon"], "min_count": 20,  "id": ["osm_type", "osm_id"]},
+    "residential":  {"geometry": ["Polygon", "MultiPolygon"], "min_count": 1000, "id": ["osm_type", "osm_id"], "required": ["building"]}
+  }
+}

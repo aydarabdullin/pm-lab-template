@@ -1,0 +1,12 @@
+# Настройки инструментов качества кода (ЛР 4)
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-include = []
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

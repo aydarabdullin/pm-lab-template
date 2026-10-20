@@ -1,0 +1,33 @@
+name: lab3-check
+# Информационная проверка ЛР 3: показывает предупреждения, но не блокирует работу.
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Обязательные документы ЛР 3
+        run: |
+          for f in docs/estimation.md docs/schedule.md docs/budget.md docs/communication-plan.md; do
+            [ -f "$f" ] || echo "::warning::Нет файла $f"
+          done
+      - name: Незаполненные места
+        run: |
+          for f in docs/estimation.md docs/schedule.md docs/budget.md docs/communication-plan.md; do
+            [ -f "$f" ] || continue
+            grep -q "TODO" "$f" && echo "::notice::В $f остались пометки TODO" || true
+            grep -q "<\.\.\.>" "$f" && echo "::notice::В $f остались незаполненные поля <...>" || true
+          done
+      - name: Диаграммы в плане
+        run: |
+          f=docs/schedule.md
+          [ -f "$f" ] || exit 0
+          grep -q "^gantt" "$f" || echo "::warning::В $f нет диаграммы Ганта (блок mermaid с gantt)"
+          grep -q "crit" "$f" || echo "::notice::В $f не отмечены критические работы (crit)"
+          grep -qi "буфер" "$f" || echo "::notice::В $f не найден буфер проекта"
+      - name: Бюджет
+        run: |
+          f=docs/budget.md
+          [ -f "$f" ] || exit 0
+          grep -q "NPV" "$f" || echo "::notice::В $f нет расчёта NPV"
+          grep -qi "резерв" "$f" || echo "::warning::В $f не указаны резервы"

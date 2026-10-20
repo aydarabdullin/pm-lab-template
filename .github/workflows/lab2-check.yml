@@ -1,0 +1,37 @@
+name: lab2-check
+# Информационная проверка ЛР 2: показывает предупреждения, но не блокирует работу.
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Обязательные документы ЛР 2
+        run: |
+          for f in docs/requirements.md docs/wbs.md docs/definition-of-done.md \
+                   docs/data-quality.md data/sources.md data/README.md \
+                   notebooks/01_data_collection.ipynb notebooks/02_data_profiling.ipynb \
+                   notebooks/03_spatial_analysis.ipynb; do
+            [ -f "$f" ] || echo "::warning::Нет файла $f"
+          done
+      - name: Незаполненные места
+        run: |
+          for f in docs/requirements.md docs/wbs.md docs/definition-of-done.md \
+                   docs/data-quality.md data/sources.md data/README.md; do
+            [ -f "$f" ] && grep -q "TODO" "$f" && echo "::notice::В $f остались пометки TODO" || true
+          done
+      - name: Сырые данные не попали в репозиторий
+        run: |
+          found=$(git ls-files data/raw | grep -v '\.gitkeep$' || true)
+          [ -z "$found" ] || echo "::warning::В data/raw/ закоммичены файлы, их нужно убрать из Git: $found"
+      - name: Размер файлов в data/processed
+        run: |
+          find data/processed -type f -size +10M -print | while read f; do
+            echo "::warning::Файл $f больше 10 МБ. Храните его вне репозитория и опишите получение в data/README.md"
+          done
+      - name: Ноутбуки сохранены без вывода
+        run: |
+          for nb in notebooks/*.ipynb; do
+            python3 -c "import json,sys; n=json.load(open(sys.argv[1])); sys.exit(any(c.get('outputs') for c in n['cells'] if c['cell_type']=='code'))" "$nb" \
+              || echo "::notice::В $nb сохранён вывод ячеек. Очистите его перед коммитом (Edit → Clear Outputs of All Cells)"
+          done

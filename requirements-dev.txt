@@ -1,0 +1,5 @@
+# Инструменты проверки качества (ЛР 4). Устанавливаются в CI, локально — по желанию:
+# pip install -r requirements-dev.txt
+geopandas>=1.0
+pytest>=8.0
+ruff>=0.6

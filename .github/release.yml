@@ -1,0 +1,21 @@
+# Категории автоматических заметок к релизу (ЛР 4).
+# При создании релиза нажмите «Generate release notes»: Pull Request'ы сгруппируются по меткам.
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Новое для пользователя
+      labels: [story]
+    - title: Данные
+      labels: [data]
+    - title: Аналитика
+      labels: [analysis]
+    - title: Исправления
+      labels: [bug]
+    - title: Качество и автоматизация
+      labels: [quality, ci]
+    - title: Документы и планирование
+      labels: [docs, plan, status, risk, decision]
+    - title: Прочее
+      labels: ["*"]

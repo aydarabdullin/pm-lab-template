@@ -1,0 +1,25 @@
+name: "Bootstrap: метки, этап и стартовые задачи"
+# Запускается вручную в начале каждой лабораторной работы:
+# Actions → этот workflow → Run workflow → выберите номер ЛР.
+on:
+  workflow_dispatch:
+    inputs:
+      lab:
+        description: "Номер лабораторной работы"
+        required: true
+        default: "1"
+        type: choice
+        options: ["1", "2", "3", "4"]
+permissions:
+  contents: read
+  issues: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Создать метки, этап и задачи
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LAB: ${{ inputs.lab }}
+        run: bash .github/scripts/bootstrap.sh

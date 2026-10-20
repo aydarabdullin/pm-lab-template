@@ -1,0 +1,41 @@
+name: ci
+# Автоматическая проверка качества (ЛР 4). Запускается на каждый Pull Request в main и на каждый push в main.
+# Имя задания «quality» указывается как обязательная проверка в правилах ветки main.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Установить инструменты
+        run: pip install -r requirements-dev.txt
+      - name: Стиль и типичные ошибки кода (ruff)
+        run: ruff check src tests scripts
+      - name: Автотесты (pytest)
+        run: pytest -q
+      - name: Проверка данных в data/processed
+        run: python scripts/validate_data.py
+      - name: Ноутбуки сохранены без вывода
+        run: |
+          status=0
+          for nb in notebooks/*.ipynb; do
+            if python3 -c "import json,sys; n=json.load(open(sys.argv[1])); sys.exit(any(c.get('outputs') for c in n['cells'] if c['cell_type']=='code'))" "$nb"; then
+              echo "OK      $nb"
+            else
+              echo "::error file=$nb::В ноутбуке сохранён вывод ячеек. Очистите его перед коммитом (в Colab: Изменить → Очистить все выходные данные)"
+              status=1
+            fi
+          done
+          exit $status

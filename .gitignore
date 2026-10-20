@@ -1,0 +1,27 @@
+# Python / Jupyter
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Сырые данные в репозиторий не коммитим: их можно скачать заново (см. data/README.md)
+data/raw/*
+!data/raw/.gitkeep
+*.tif
+*.tiff
+*.zip
+*.pbf
+
+# Системные файлы
+.DS_Store
+.idea/
+.vscode/
+
+# Временные выгрузки ноутбуков
+*.out.ipynb
+
+# Кэш инструментов проверки (ЛР 4)
+.pytest_cache/
+.ruff_cache/
+monte_carlo.png
